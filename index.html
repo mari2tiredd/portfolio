@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directory — Portal</title>
+    <!-- Tailwind CSS via CDN for zero-setup modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font for clean typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        oled: '#000000',
+                        surface: '#0a0a0a',
+                        surfaceHover: '#121212',
+                        borderSubtle: '#1f1f1f',
+                        borderHover: '#383838',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ededed;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* Subtle radial glow at the top */
+        .top-glow {
+            background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.06) 0%, rgba(0, 0, 0, 0) 60%);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-white selection:text-black top-glow">
+
+    <!-- Main Container -->
+    <main class="w-full max-w-5xl mx-auto px-6 py-20 md:py-28">
+        
+        <!-- Header Section -->
+        <header class="mb-16">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface border border-borderSubtle text-xs text-neutral-400 mb-6">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Index &amp; Directory</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-semibold tracking-tight text-white mb-4">
+                Workspace Portal.
+            </h1>
+            <p class="text-neutral-400 text-lg max-w-xl font-light leading-relaxed">
+                A curated collection of projects, web applications, and digital spaces. Select a destination below to launch.
+            </p>
+        </header>
+
+        <!-- Sites Grid (Populated automatically by the script below) -->
+        <div id="sites-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Cards will be injected here -->
+        </div>
+
+    </main>
+
+    <!-- Minimal Footer -->
+    <footer class="w-full max-w-5xl mx-auto px-6 py-8 border-t border-borderSubtle flex flex-col sm:flex-row justify-between items-center text-xs text-neutral-500 gap-4">
+        <p>&copy; <span id="year"></span> All rights reserved.</p>
+        <p class="font-mono text-neutral-600">STATUS: ONLINE</p>
+    </footer>
+
+    <!-- =================================================================== -->
+    <!-- CONFIGURATION: ADD OR EDIT YOUR SITES IN THE LIST BELOW             -->
+    <!-- =================================================================== -->
+    <script>
+        const sites = [
+            {
+                title: "Main Portfolio",
+                description: "Personal showcase, case studies, and design work.",
+                url: "https://example.com",
+                tag: "Live"
+            },
+            {
+                title: "Web App Dashboard",
+                description: "Analytics and internal management tools.",
+                url: "https://example.com",
+                tag: "App"
+            },
+            {
+                title: "Documentation",
+                description: "Guides, API references, and system architecture.",
+                url: "https://example.com",
+                tag: "Docs"
+            },
+            // To add a new site later, copy from '{' to '},' and paste it below:
+            {
+                title: "Future Slot 01",
+                description: "Reserved space for an upcoming project or link.",
+                url: "#",
+                tag: "Soon",
+                placeholder: true // Set to false when you add a real link
+            },
+            {
+                title: "Future Slot 02",
+                description: "Reserved space for an upcoming project or link.",
+                url: "#",
+                tag: "Soon",
+                placeholder: true
+            }
+        ];
+
+        // ===================================================================
+        // RENDER LOGIC (No need to edit below this line)
+        // ===================================================================
+        const grid = document.getElementById('sites-grid');
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        sites.forEach(site => {
+            const isPlaceholder = site.placeholder;
+            const card = document.createElement(isPlaceholder ? 'div' : 'a');
+            
+            if (!isPlaceholder) {
+                card.href = site.url;
+                card.target = "_blank";
+                card.rel = "noopener noreferrer";
+            }
+
+            // Styling for active cards vs placeholder slots
+            card.className = isPlaceholder
+                ? "group relative flex flex-col justify-between p-6 rounded-2xl bg-black border border-dashed border-borderSubtle opacity-50 select-none"
+                : "group relative flex flex-col justify-between p-6 rounded-2xl bg-surface border border-borderSubtle hover:bg-surfaceHover hover:border-borderHover transition-all duration-300 ease-out hover:-translate-y-0.5";
+
+            card.innerHTML = `
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-[11px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-md ${isPlaceholder ? 'bg-neutral-900 text-neutral-600' : 'bg-neutral-900 text-neutral-300 border border-neutral-800'}">
+                            ${site.tag}
+                        </span>
+                        ${!isPlaceholder ? `
+                        <svg class="w-4 h-4 text-neutral-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M7 17L17 7M17 7H8M17 7V16" />
+                        </svg>
+                        ` : ''}
+                    </div>
+                    <h2 class="text-lg font-medium text-white mb-2 group-hover:text-white">
+                        ${site.title}
+                    </h2>
+                    <p class="text-sm text-neutral-400 font-light leading-relaxed">
+                        ${site.description}
+                    </p>
+                </div>
+            `;
+
+            grid.appendChild(card);
+        });
+    </script>
+</body>
+</html>
