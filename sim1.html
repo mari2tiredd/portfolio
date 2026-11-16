@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Harlem Renaissance: Interactive Timeline & Resident Simulation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: '#000000',
+                        royalPlum: '#40036b',
+                        electricMagenta: '#fc03d3',
+                        charcoalSurface: '#0a0a0d',
+                        elevatedSurface: '#12081c',
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar for Minimalist Aesthetic */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #40036b;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #fc03d3;
+        }
+        .glow-border {
+            box-shadow: 0 0 25px rgba(64, 3, 107, 0.45);
+        }
+        .magenta-glow {
+            box-shadow: 0 0 20px rgba(252, 3, 211, 0.35);
+        }
+        .fade-in {
+            animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-obsidian text-white font-sans antialiased selection:bg-electricMagenta selection:text-black min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- Top Navigation Bar -->
+    <header class="border-b border-royalPlum/60 bg-obsidian/90 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full bg-electricMagenta magenta-glow"></div>
+                <div>
+                    <h1 class="font-serif text-xl sm:text-2xl lg:text-3xl font-bold tracking-wide text-white leading-none">
+                        HARLEM <span class="text-electricMagenta italic font-normal">1917–1937</span>
+                    </h1>
+                    <p class="text-[11px] sm:text-xs text-gray-400 tracking-widest uppercase mt-0.5">Living Cultural Simulation</p>
+                </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button id="toggleAutoPlayBtn" class="px-3 sm:px-4 py-2 rounded-full border border-royalPlum bg-elevatedSurface hover:border-electricMagenta text-xs sm:text-sm font-medium transition-all flex items-center gap-2 cursor-pointer">
+                    <span id="playIcon" class="w-2 h-2 rounded-full bg-electricMagenta"></span>
+                    <span id="playText">Auto-Play Era</span>
+                </button>
+                <button id="openResidentsModalBtn" class="px-4 sm:px-5 py-2 rounded-full bg-royalPlum hover:bg-electricMagenta hover:text-black text-white text-xs sm:text-sm font-semibold transition-all duration-300 magenta-glow flex items-center gap-2 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    <span>Famous Residents</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Interactive Stage -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6">
+
+        <!-- Visual Simulation Viewport & Event Narrative Split -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+
+            <!-- Left 7 Columns: Live Visual Street & Atmosphere Canvas -->
+            <div class="lg:col-span-7 flex flex-col rounded-2xl border border-royalPlum/70 bg-charcoalSurface overflow-hidden glow-border relative">
+                <!-- Canvas Header Overlay -->
+                <div class="px-5 py-3.5 border-b border-royalPlum/40 flex items-center justify-between bg-obsidian/60">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs uppercase tracking-widest text-electricMagenta font-semibold" id="eraPhaseTag">Phase I: The Great Migration</span>
+                    </div>
+                    <div class="text-xs text-gray-400 font-mono" id="canvasLocationLabel">135th Street & Lenox Ave</div>
+                </div>
+
+                <!-- Interactive HTML5 Canvas -->
+                <div class="relative w-full h-64 sm:h-80 md:h-96 bg-obsidian flex-1" id="canvasContainer">
+                    <canvas id="harlemCanvas" class="w-full h-full block"></canvas>
+
+                    <!-- Floating Year Watermark -->
+                    <div class="absolute top-4 left-5 pointer-events-none select-none">
+                        <span id="canvasYearDisplay" class="font-serif text-5xl sm:text-7xl font-bold text-white/15 tracking-tight">1917</span>
+                    </div>
+
+                    <!-- Interactive Canvas Legend / Vibe Indicator -->
+                    <div class="absolute bottom-3 left-4 right-4 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+                        <div class="px-3 py-1 rounded-full bg-obsidian/85 border border-royalPlum/70 text-[11px] text-gray-300 backdrop-blur-sm">
+                            Atmosphere: <span id="atmosphereLabel" class="text-electricMagenta font-medium">Wartime Awakening & Parade</span>
+                        </div>
+                        <div class="px-3 py-1 rounded-full bg-obsidian/85 border border-royalPlum/70 text-[11px] text-gray-400 backdrop-blur-sm hidden sm:block">
+                            Move cursor across street to illuminate
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right 5 Columns: Historical Event Card -->
+            <div class="lg:col-span-5 flex flex-col justify-between rounded-2xl border border-royalPlum/70 bg-elevatedSurface/60 p-6 sm:p-8 glow-border">
+                <div id="eventContentBox" class="fade-in">
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <span id="eventDateBadge" class="px-3 py-1 rounded-full bg-royalPlum/50 border border-electricMagenta/50 text-electricMagenta text-xs font-semibold tracking-wider uppercase">
+                            July 28, 1917
+                        </span>
+                        <span id="eventCategoryBadge" class="text-xs uppercase tracking-widest text-gray-400">
+                            Civic Action
+                        </span>
+                    </div>
+
+                    <h2 id="eventTitle" class="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight mb-4">
+                        The Silent Protest Parade
+                    </h2>
+
+                    <p id="eventDescription" class="text-gray-300 text-sm sm:text-base leading-relaxed mb-6">
+                        Nearly 10,000 African Americans march silently down Fifth Avenue to the beat of muffled drums, protesting racial violence and lynchings. Organized by W.E.B. Du Bois and the NAACP, this disciplined demonstration marks the political awakening of the New Negro Movement.
+                    </p>
+
+                    <!-- Key Historical Impact Box -->
+                    <div class="p-4 rounded-xl bg-obsidian/80 border-l-2 border-electricMagenta mb-6">
+                        <p class="text-xs uppercase tracking-wider text-electricMagenta font-semibold mb-1">Cultural Ripple Effect</p>
+                        <p id="eventImpact" class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                            Established Harlem as the intellectual and political nerve center of Black America, setting the stage for artistic self-determination.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Connected Resident Quick-Jump & Step Controls -->
+                <div class="pt-4 border-t border-royalPlum/40 flex flex-col gap-4">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-xs text-gray-400">Key Figure in this Moment:</span>
+                        <button id="quickResidentBtn" class="text-xs font-semibold text-electricMagenta hover:underline flex items-center gap-1 cursor-pointer">
+                            <span id="quickResidentName">W.E.B. Du Bois</span>
+                            <span>→</span>
+                        </button>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-3">
+                        <button id="prevEventBtn" class="flex-1 py-2.5 px-4 rounded-xl border border-royalPlum bg-obsidian hover:border-electricMagenta text-sm font-medium transition-colors cursor-pointer disabled:opacity-30">
+                            ← Previous
+                        </button>
+                        <span id="stepCounter" class="text-xs font-mono text-gray-400 px-2">1 / 10</span>
+                        <button id="nextEventBtn" class="flex-1 py-2.5 px-4 rounded-xl bg-royalPlum hover:bg-electricMagenta hover:text-black text-white text-sm font-semibold transition-colors cursor-pointer">
+                            Next Event →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Section: Interactive Scrubber Timeline -->
+        <section class="rounded-2xl border border-royalPlum/70 bg-charcoalSurface p-5 sm:p-6 glow-border">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5">
+                <div>
+                    <h3 class="font-serif text-lg sm:text-xl font-bold text-white">Chronological Timeline (1917 – 1937)</h3>
+                    <p class="text-xs text-gray-400">Select any milestone node below to witness how Harlem evolved year by year.</p>
+                </div>
+                <div class="flex items-center gap-4 text-xs text-gray-400">
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-electricMagenta inline-block"></span> Active Milestone</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-royalPlum inline-block"></span> Historical Event</span>
+                </div>
+            </div>
+
+            <!-- Horizontal Scrollable / Responsive Timeline Track -->
+            <div class="relative pt-4 pb-2 overflow-x-auto">
+                <div class="min-w-[760px] px-4">
+                    <!-- Connecting Track Line -->
+                    <div class="relative h-1 bg-royalPlum/40 rounded-full my-6">
+                        <div id="timelineProgressFill" class="absolute top-0 left-0 h-full bg-electricMagenta rounded-full transition-all duration-500" style="width: 0%;"></div>
+                        <!-- Timeline Nodes Container -->
+                        <div id="timelineNodesContainer" class="absolute inset-0 flex items-center justify-between">
+                            <!-- Populated dynamically via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Famous Harlem Renaissance Residents Modal / Drawer -->
+    <div id="residentsModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-md">
+        <div class="w-full max-w-5xl max-h-[90vh] rounded-2xl border border-electricMagenta/60 bg-charcoalSurface flex flex-col overflow-hidden shadow-2xl fade-in">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-royalPlum/60 bg-obsidian flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] uppercase tracking-widest text-electricMagenta font-semibold">Voices & Visionaries</span>
+                    <h2 class="font-serif text-2xl sm:text-3xl font-bold text-white">Famous Residents of Harlem</h2>
+                </div>
+                <button id="closeResidentsModalBtn" class="p-2 rounded-full border border-royalPlum hover:border-electricMagenta text-gray-300 hover:text-electricMagenta transition-colors cursor-pointer" aria-label="Close modal">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Body: Resident Selector + Detailed Biography -->
+            <div class="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-12">
+                
+                <!-- Left Resident Selector List -->
+                <div class="md:col-span-4 border-b md:border-b-0 md:border-r border-royalPlum/50 bg-obsidian/60 p-4 flex md:flex-col gap-2 overflow-x-auto md:overflow-y-auto" id="residentListContainer">
+                    <!-- Resident buttons populated dynamically -->
+                </div>
+
+                <!-- Right Resident Life & Survival Profile -->
+                <div class="md:col-span-8 p-6 sm:p-8 bg-elevatedSurface/30 flex flex-col justify-between" id="residentDetailContainer">
+                    <!-- Populated dynamically -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        /**
+         * HISTORICAL DATASET: HARLEM RENAISSANCE TIMELINE (1917 - 1937)
+         */
+        const timelineEvents = [
+            {
+                year: "1917",
+                date: "July 28, 1917",
+                phase: "Phase I: The Great Migration & Awakening",
+                category: "Civic Protest",
+                title: "The Silent Protest Parade",
+                location: "Fifth Avenue & Harlem",
+                atmosphere: "Muffled Drums & Marching Footsteps",
+                visualTheme: "parade",
+                description: "Nearly 10,000 African Americans march silently down Fifth Avenue to the beat of muffled drums, protesting racial violence and lynchings in East St. Louis and the South. Organized by W.E.B. Du Bois and James Weldon Johnson, it signals a fearless new era of collective self-advocacy.",
+                impact: "Transformed Harlem into the political and intellectual capital of Black America, sparking pride and artistic urgency.",
+                residentId: "dubois"
+            },
+            {
+                year: "1919",
+                date: "February 17, 1919",
+                phase: "Phase I: The Great Migration & Awakening",
+                category: "Heroic Return",
+                title: "The Harlem Hellfighters Return Home",
+                location: "135th Street & Lenox Avenue",
+                atmosphere: "Triumphant Brass & Confetti",
+                visualTheme: "hellfighters",
+                description: "The 369th Infantry Regiment—known as the 'Harlem Hellfighters'—marches triumphantly up Fifth Avenue into Harlem after spending 191 days in World War I trenches. Bandleader James Reese Europe introduces electrifying syncopated jazz rhythms to New York crowds.",
+                impact: "Ignited the Jazz Age in Manhattan and proved that Black veterans would demand full citizenship and dignity at home.",
+                residentId: "hughes"
+            },
+            {
+                year: "1921",
+                date: "May 23, 1921",
+                phase: "Phase II: The Cultural Explosion",
+                category: "Broadway & Theater",
+                title: "Shuffle Along Debuts on Broadway",
+                location: "63rd Street Music Hall",
+                atmosphere: "Spotlight & Syncopated Ragtime",
+                visualTheme: "theater",
+                description: "Written, produced, and performed entirely by African Americans—including Noble Sissle, Eubie Blake, and Josephine Baker—'Shuffle Along' becomes a runaway Broadway smash. It introduces jazz dance to mainstream theater and draws white audiences uptown to Harlem.",
+                impact: "Broke racial barriers on Broadway and launched the careers of Josephine Baker, Paul Robeson, and Florence Mills.",
+                residentId: "baker"
+            },
+            {
+                year: "1923",
+                date: "December 4, 1923",
+                phase: "Phase II: The Cultural Explosion",
+                category: "Nightlife & Music",
+                title: "The Cotton Club & Savoy Era Begins",
+                location: "142nd Street & Lenox Avenue",
+                atmosphere: "Neon Glow & Big Band Swing",
+                visualTheme: "nightclub",
+                description: "Harlem's nightlife explodes with legendary venues. While the Cotton Club features segregated seating with Duke Ellington's orchestra on stage, the Savoy Ballroom ('The Home of Happy Feet') opens its doors to integrated dancers innovating the Lindy Hop.",
+                impact: "Created a nightly laboratory where Duke Ellington, Cab Calloway, and Bessie Smith revolutionized American music.",
+                residentId: "ellington"
+            },
+            {
+                year: "1924",
+                date: "March 21, 1924",
+                phase: "Phase II: The Cultural Explosion",
+                category: "Literary Gathering",
+                title: "The Civic Club Dinner",
+                location: "12th Street / Harlem Literary Circle",
+                atmosphere: "Candlelit Typewriters & Verse",
+                visualTheme: "literature",
+                description: "Sociologist Charles S. Johnson hosts a landmark dinner bringing young Black writers—including Langston Hughes, Countee Cullen, and Zora Neale Hurston—together with major New York book publishers and magazine editors.",
+                impact: "Directly unlocked publishing contracts, literary prizes, and national magazines for a generation of Black authors.",
+                residentId: "hurston"
+            },
+            {
+                year: "1925",
+                date: "March 1925",
+                phase: "Phase III: The Golden Zenith",
+                category: "Philosophy & Art",
+                title: "Alain Locke Publishes 'The New Negro'",
+                location: "135th Street Public Library",
+                atmosphere: "Philosophical Salon & Modernist Art",
+                visualTheme: "literature",
+                description: "Philosopher Alain Locke edits the anthology 'The New Negro: An Interpretation,' illustrated by Winold Reiss and Aaron Douglas. It declares that Black Americans are shedding old stereotypes in favor of bold self-expression and racial pride.",
+                impact: "Became the foundational manifesto of the Harlem Renaissance, uniting visual art, poetry, sociology, and music.",
+                residentId: "douglas"
+            },
+            {
+                year: "1926",
+                date: "November 1926",
+                phase: "Phase III: The Golden Zenith",
+                category: "Avant-Garde Art",
+                title: "FIRE!! Magazine & The Dark Tower Salon",
+                location: "136th Street (A'Lelia Walker's Townhouse)",
+                atmosphere: "Bohemian Salon & Bold Print",
+                visualTheme: "salon",
+                description: "Young artists Langston Hughes, Zora Neale Hurston, and Wallace Thurman publish 'FIRE!!', an unapologetic magazine exploring queer life, working-class Harlem, and bold aesthetics, while heiress A'Lelia Walker hosts lavish integrated salons at 'The Dark Tower.'",
+                impact: "Asserted total artistic freedom—refusing to sanitize Black life for conservative critics or wealthy patrons.",
+                residentId: "walker"
+            },
+            {
+                year: "1928",
+                date: "Autumn 1928",
+                phase: "Phase III: The Golden Zenith",
+                category: "Fine Art & Sculpture",
+                title: "Augusta Savage & The Harlem Art Workshop",
+                location: "143rd Street Studio",
+                atmosphere: "Sculpted Bronze & Studio Clay",
+                visualTheme: "art",
+                description: "Sculptor Augusta Savage crafts 'Gamin,' an expressive bust of a Harlem youth that wins her a prestigious Julius Rosenwald Fellowship to study in Paris. Upon returning, she establishes studios that mentor Jacob Lawrence and Norman Lewis.",
+                impact: "Democratized fine arts training in Harlem, proving that world-class sculpture and painting thrived uptown.",
+                residentId: "savage"
+            },
+            {
+                year: "1929",
+                date: "October 29, 1929",
+                phase: "Phase IV: Resilience Through the Depression",
+                category: "Economic Shift",
+                title: "The Wall Street Crash & Rent Parties",
+                location: "Harlem Brownstones",
+                atmosphere: "Stride Piano & Midnight Kitchens",
+                visualTheme: "rentparty",
+                description: "The Great Depression hits Harlem harder and earlier than the rest of New York. Facing skyrocketing unemployment and discriminatory rents, residents invent 'Rent Parties'—charging modest entry fees for basement jazz by Fats Waller and home-cooked soul food.",
+                impact: "Turned economic survival into community solidarity, keeping families housed while birthing Harlem stride piano.",
+                residentId: "hughes"
+            },
+            {
+                year: "1937",
+                date: "1937",
+                phase: "Phase IV: Legacy & Enduring Light",
+                category: "Literary Masterpiece",
+                title: "'Their Eyes Were Watching God' Published",
+                location: "Harlem & Eatonville Legacy",
+                atmosphere: "Golden Horizon & Enduring Voice",
+                visualTheme: "legacy",
+                description: "Zora Neale Hurston publishes her masterwork 'Their Eyes Were Watching God,' celebrating Black folklore, dialect, and female independence. Though the economic boom of the 1920s has faded, the artistic foundation built in Harlem permanently reshapes global culture.",
+                impact: "Cemented the Harlem Renaissance as one of the most influential cultural movements in modern world history.",
+                residentId: "hurston"
+            }
+        ];
+
+        /**
+         * FAMOUS RESIDENTS DATASET: BIOGRAPHIES & HOW THEY MANAGED TO LIVE THEIR LIVES
+         */
+        const residentsData = [
+            {
+                id: "hughes",
+                name: "Langston Hughes",
+                years: "1902 – 1967",
+                role: "Poet, Playwright & Columnist",
+                address: "20 East 127th Street, Harlem",
+                quote: "I, too, sing America. I am the darker brother.",
+                generalLife: "Known as the 'Poet Laureate of Harlem,' Langston Hughes captured the everyday joys, heartbreaks, and jazz rhythms of working-class Black residents. Unlike elite writers who favored classical European forms, Hughes wove blues and jazz cadences directly into his verse.",
+                howTheyLived: "Before achieving fame, Hughes worked relentlessly as a busboy at the Wardman Park Hotel, a merchant seaman traveling to Africa and Europe, and a laundry worker. He famously slipped three of his poems beside poet Vachel Lindsay's dinner plate while bussing tables. Later, he survived the Great Depression by touring the American South giving paid poetry readings at Black colleges and churches, alongside support from literary patrons and newspaper columns."
+            },
+            {
+                id: "hurston",
+                name: "Zora Neale Hurston",
+                years: "1891 – 1960",
+                role: "Novelist, Folklorist & Anthropologist",
+                address: "West 131st Street, Harlem",
+                quote: "There are years that ask questions and years that answer.",
+                generalLife: "Vibrant, witty, and fiercely independent, Zora Neale Hurston arrived in Harlem in 1925 with $1.50 in her pocket and a head full of Southern folklore. She became the first Black student at Barnard College, studying anthropology under Franz Boas while dazzling Harlem literary salons.",
+                howTheyLived: "Hurston lived a resourceful, nomadic life driven by curiosity. She supported herself through college as a manicurist and personal secretary to novelist Fannie Hurst. To fund her anthropological expeditions recording rural Black songs and folktales in Florida and Haiti, she secured competitive fellowships from the Rosenwald Fund and Guggenheim Foundation, living simply out of suitcases and writing in rented rooms."
+            },
+            {
+                id: "ellington",
+                name: "Duke Ellington",
+                years: "1899 – 1974",
+                role: "Composer, Pianist & Bandleader",
+                address: "935 St. Nicholas Avenue (Sugar Hill)",
+                quote: "Music is my mistress, and she plays second fiddle to no one.",
+                generalLife: "Edward Kennedy 'Duke' Ellington elevated jazz into sophisticated orchestral art. Arriving in Harlem from Washington, D.C., he transformed the Cotton Club into an international broadcast sensation, transmitting his 'jungle style' and lush harmonies into millions of American living rooms via live radio.",
+                howTheyLived: "Ellington lived with aristocratic poise in Harlem's upscale Sugar Hill neighborhood. He managed his career through strict artistic discipline—composing music on trains between tour stops and retaining ownership of his publishing royalties whenever possible. He kept his orchestra together for decades by writing custom musical parts tailored specifically to each musician's unique tone."
+            },
+            {
+                id: "savage",
+                name: "Augusta Savage",
+                years: "1892 – 1962",
+                role: "Sculptor & Art Educator",
+                address: "163 West 143rd Street, Harlem",
+                quote: "If I can inspire one of these youngsters to develop the talent I know they possess, then my monument will be in their work.",
+                generalLife: "Augusta Savage was a trailblazing sculptor whose lifelike busts celebrated African American dignity and beauty. Despite facing blatant racial discrimination—including having a French art scholarship revoked when judges discovered she was Black—she refused to give up her craft.",
+                howTheyLived: "Savage survived through sheer grit and community solidarity. When she couldn't afford expensive marble or bronze, she sculpted with plaster and painted it to look like bronze, or scavenged clay from local brickyards. She made ends meet working in steam laundries and apartments while turning her basement studio into the Savage Studio of Arts and Crafts, teaching hundreds of Harlem youth for free."
+            },
+            {
+                id: "walker",
+                name: "A'Lelia Walker",
+                years: "1885 – 1931",
+                role: "Arts Patron & Entrepreneur",
+                address: "108–110 West 136th Street ('The Dark Tower')",
+                quote: "Welcome to The Dark Tower—where poets, princes, and painters meet as equals.",
+                generalLife: "As the daughter of self-made haircare millionaire Madam C.J. Walker, A'Lelia Walker became the 'Joy Goddess of Harlem.' Her lavish townhouse on 136th Street featured a legendary salon called 'The Dark Tower,' where Harlem artists mingled freely with European royalty and Broadway stars.",
+                howTheyLived: "Inheriting leadership of the Madam C.J. Walker Manufacturing Company, A'Lelia managed a nationwide network of beauty schools and sales agents while channeling her wealth into Harlem's cultural ecosystem. She paid poets to recite at her gatherings, bought paintings directly from struggling Harlem sculptors, and kept artists fed and connected during lean months."
+            },
+            {
+                id: "dubois",
+                name: "W.E.B. Du Bois",
+                years: "1868 – 1963",
+                role: "Sociologist, Editor & Civil Rights Architect",
+                address: "409 Edgecombe Avenue, Sugar Hill",
+                quote: "The problem of the twentieth century is the problem of the color line.",
+                generalLife: "The first African American to earn a Ph.D. from Harvard, W.E.B. Du Bois edited 'The Crisis,' the official magazine of the NAACP headquartered in New York. He used its pages to publish the earliest poems and stories of Langston Hughes, Countee Cullen, and Nella Larsen.",
+                howTheyLived: "Du Bois lived an austere, disciplined intellectual life in Sugar Hill's prestigious 409 Edgecombe Avenue. He earned a modest salary as an editor and university professor, pouring his waking hours into investigative journalism, sociological research, and mentoring young writers to use art as an instrument for racial justice."
+            },
+            {
+                id: "douglas",
+                name: "Aaron Douglas",
+                years: "1899 – 1979",
+                role: "Painter, Illustrator & Muralist",
+                address: "409 Edgecombe Avenue, Harlem",
+                quote: "Our problem is to conceive, develop, establish an era in which white critics are no longer the sole arbiters of our art.",
+                generalLife: "Known as the 'Father of African American Art,' Aaron Douglas created the signature visual language of the Harlem Renaissance—blending Art Deco geometric rays, silhouetted figures, and West African sculptural motifs into luminous murals and book covers.",
+                howTheyLived: "Moving from Kansas to Harlem in 1925, Douglas initially supported himself by illustrating magazine covers for 'Opportunity' and 'The Crisis' and designing book jackets for nearly every major Renaissance author. He later secured commissions for grand public murals—including 'Aspects of Negro Life' at the 135th Street Library—and founded the Art Department at Fisk University."
+            },
+            {
+                id: "baker",
+                name: "Josephine Baker",
+                years: "1906 – 1975",
+                role: "Dancer, Singer & Civil Rights Activist",
+                address: "Harlem Theater District & Paris",
+                quote: "Surely the day will come when color means nothing more than the skin tone, when music is judged by its rhythm.",
+                generalLife: "Starting out as a comedic chorus dancer in Harlem's 'Shuffle Along' and the Plantation Club, Josephine Baker captivated audiences with her expressive physical comedy, radiant charisma, and electrifying jazz rhythms before becoming a global icon in Paris.",
+                howTheyLived: "Born into poverty in St. Louis, Baker survived by performing on street corners as a child and touring the grueling Black vaudeville circuit (TOBA) before reaching Harlem. By saving her earnings and seizing an opportunity to perform in 'La Revue Nègre' in Paris in 1925, she gained artistic freedom and financial independence—later using her fame and wealth to spy for the French Resistance in WWII."
+            }
+        ];
+
+        /**
+         * APPLICATION STATE
+         */
+        let currentEventIndex = 0;
+        let selectedResidentId = "hughes";
+        let isAutoPlaying = false;
+        let autoPlayInterval = null;
+
+        // DOM Elements
+        const canvas = document.getElementById("harlemCanvas");
+        const ctx = canvas.getContext("2d");
+        const canvasContainer = document.getElementById("canvasContainer");
+
+        const eraPhaseTag = document.getElementById("eraPhaseTag");
+        const canvasLocationLabel = document.getElementById("canvasLocationLabel");
+        const canvasYearDisplay = document.getElementById("canvasYearDisplay");
+        const atmosphereLabel = document.getElementById("atmosphereLabel");
+        const eventDateBadge = document.getElementById("eventDateBadge");
+        const eventCategoryBadge = document.getElementById("eventCategoryBadge");
+        const eventTitle = document.getElementById("eventTitle");
+        const eventDescription = document.getElementById("eventDescription");
+        const eventImpact = document.getElementById("eventImpact");
+        const quickResidentName = document.getElementById("quickResidentName");
+        const quickResidentBtn = document.getElementById("quickResidentBtn");
+        const stepCounter = document.getElementById("stepCounter");
+        const prevEventBtn = document.getElementById("prevEventBtn");
+        const nextEventBtn = document.getElementById("nextEventBtn");
+        const timelineNodesContainer = document.getElementById("timelineNodesContainer");
+        const timelineProgressFill = document.getElementById("timelineProgressFill");
+        const eventContentBox = document.getElementById("eventContentBox");
+
+        const toggleAutoPlayBtn = document.getElementById("toggleAutoPlayBtn");
+        const playIcon = document.getElementById("playIcon");
+        const playText = document.getElementById("playText");
+
+        const residentsModal = document.getElementById("residentsModal");
+        const openResidentsModalBtn = document.getElementById("openResidentsModalBtn");
+        const closeResidentsModalBtn = document.getElementById("closeResidentsModalBtn");
+        const residentListContainer = document.getElementById("residentListContainer");
+        const residentDetailContainer = document.getElementById("residentDetailContainer");
+
+        /**
+         * VISUAL SIMULATION ENGINE (HTML5 CANVAS)
+         * Renders an atmospheric Art Deco Harlem cityscape with dynamic particles,
+         * spotlights, musical notes, and interactive mouse/touch illumination.
+         */
+        let particles = [];
+        let pointer = { x: -500, y: -500, active: false };
+        let animationTime = 0;
+
+        function resizeCanvas() {
+            const rect = canvasContainer.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 42; i++) {
+                particles.push({
+                    x: Math.random() * 900,
+                    y: Math.random() * 400,
+                    vx: (Math.random() - 0.5) * 0.6,
+                    vy: -0.25 - Math.random() * 0.55,
+                    size: 1.5 + Math.random() * 3,
+                    isMagenta: Math.random() > 0.45,
+                    phase: Math.random() * Math.PI * 2
+                });
+            }
+        }
+
+        function drawSimulationFrame() {
+            const width = canvasContainer.clientWidth;
+            const height = canvasContainer.clientHeight;
+            animationTime += 0.02;
+
+            // 1. Deep Obsidian & Royal Plum Night Sky Gradient
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
+            skyGrad.addColorStop(0, "#000000");
+            skyGrad.addColorStop(0.65, "#170226");
+            skyGrad.addColorStop(1, "#40036b");
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, width, height);
+
+            // 2. Art Deco Geometric Sunburst / Spotlight Rays (Inspired by Aaron Douglas)
+            const currentEvent = timelineEvents[currentEventIndex];
+            const rayOriginX = width * 0.72;
+            const rayOriginY = height * 0.35;
+
+            ctx.save();
+            for (let i = 0; i < 5; i++) {
+                const radius = 65 + i * 52 + Math.sin(animationTime + i) * 6;
+                ctx.beginPath();
+                ctx.arc(rayOriginX, rayOriginY, radius, 0, Math.PI * 2);
+                ctx.strokeStyle = i % 2 === 0
+                    ? "rgba(252, 3, 211, 0.11)"
+                    : "rgba(64, 3, 107, 0.35)";
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // 3. Interactive Cursor Spotlight Glow
+            if (pointer.active) {
+                const glow = ctx.createRadialGradient(pointer.x, pointer.y, 5, pointer.x, pointer.y, 150);
+                glow.addColorStop(0, "rgba(252, 3, 211, 0.22)");
+                glow.addColorStop(0.5, "rgba(64, 3, 107, 0.14)");
+                glow.addColorStop(1, "rgba(0, 0, 0, 0)");
+                ctx.fillStyle = glow;
+                ctx.fillRect(0, 0, width, height);
+            }
+
+            // 4. Harlem Brownstones & Theater Skyline Silhouette
+            const buildingSpecs = [
+                { x: 0.02, w: 0.11, h: 0.56, windows: 4 },
+                { x: 0.14, w: 0.13, h: 0.68, windows: 5 },
+                { x: 0.28, w: 0.10, h: 0.50, windows: 3 },
+                { x: 0.39, w: 0.16, h: 0.75, windows: 6, marquee: true },
+                { x: 0.56, w: 0.12, h: 0.60, windows: 4 },
+                { x: 0.69, w: 0.14, h: 0.66, windows: 5 },
+                { x: 0.84, w: 0.14, h: 0.54, windows: 4 }
+            ];
+
+            const streetY = height * 0.84;
+
+            buildingSpecs.forEach((b, idx) => {
+                const bx = b.x * width;
+                const bw = b.w * width;
+                const bh = b.h * height;
+                const by = streetY - bh;
+
+                // Building body
+                ctx.fillStyle = "#050208";
+                ctx.fillRect(bx, by, bw, bh);
+
+                // Art Deco roofline trim
+                ctx.strokeStyle = idx % 2 === 0 ? "rgba(64, 3, 107, 0.85)" : "rgba(252, 3, 211, 0.45)";
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(bx, by, bw, bh);
+
+                // Illuminated Brownstone Windows
+                const cols = 3;
+                const rows = b.windows;
+                const padX = bw * 0.18;
+                const padY = bh * 0.14;
+                const winW = (bw - padX * 2) / (cols * 1.5);
+                const winH = (bh - padY * 2) / (rows * 1.8);
+
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        const wx = bx + padX + c * (winW * 1.65);
+                        const wy = by + padY + r * (winH * 1.75);
+                        const shimmer = Math.sin(animationTime * 1.5 + idx + r * 2 + c);
+
+                        if (shimmer > -0.25) {
+                            ctx.fillStyle = (r + idx) % 3 === 0
+                                ? "rgba(252, 3, 211, 0.65)"
+                                : "rgba(136, 45, 209, 0.55)";
+                            ctx.fillRect(wx, wy, winW, winH);
+                        }
+                    }
+                }
+
+                // Theater Marquee Sign (Apollo / Lafayette / Cotton Club tribute)
+                if (b.marquee) {
+                    const mW = bw * 1.15;
+                    const mH = 18;
+                    const mX = bx - (mW - bw) / 2;
+                    const mY = streetY - bh * 0.34;
+
+                    ctx.fillStyle = "#40036b";
+                    ctx.fillRect(mX, mY, mW, mH);
+                    ctx.strokeStyle = "#fc03d3";
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(mX, mY, mW, mH);
+
+                    // Marquee chase lights
+                    for (let lx = mX + 5; lx < mX + mW - 4; lx += 8) {
+                        const pulse = Math.sin(animationTime * 6 + lx) > 0;
+                        ctx.fillStyle = pulse ? "#fc03d3" : "#ffffff";
+                        ctx.beginPath();
+                        ctx.arc(lx, mY + mH / 2, 1.8, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            });
+
+            // 5. Harlem Avenue & Reflective Sidewalk
+            ctx.fillStyle = "#030105";
+            ctx.fillRect(0, streetY, width, height - streetY);
+
+            ctx.strokeStyle = "#fc03d3";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(0, streetY);
+            ctx.lineTo(width, streetY);
+            ctx.stroke();
+
+            // 6. Theme-Specific Street Figures & Movement
+            const figureCount = currentEvent.visualTheme === "parade" || currentEvent.visualTheme === "hellfighters" ? 14 : 7;
+            for (let f = 0; f < figureCount; f++) {
+                const speed = currentEvent.visualTheme === "parade" ? 18 : 10;
+                const fx = ((f * (width / figureCount) + animationTime * speed) % (width + 40)) - 20;
+                const fy = streetY - 2;
+                const bob = Math.abs(Math.sin(animationTime * 4 + f)) * 2.5;
+
+                // Stylized silhouette figure
+                ctx.fillStyle = f % 2 === 0 ? "#fc03d3" : "#c084fc";
+                // Head
+                ctx.beginPath();
+                ctx.arc(fx, fy - 16 - bob, 3, 0, Math.PI * 2);
+                ctx.fill();
+                // Torso
+                ctx.fillRect(fx - 2.5, fy - 12 - bob, 5, 11);
+            }
+
+            // 7. Floating Cultural Sparks / Jazz Notes
+            particles.forEach((p) => {
+                p.x += p.vx + Math.sin(animationTime + p.phase) * 0.2;
+                p.y += p.vy;
+
+                if (p.y < 10) {
+                    p.y = streetY - 10;
+                    p.x = Math.random() * width;
+                }
+                if (p.x < 0) p.x = width;
+                if (p.x > width) p.x = 0;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.isMagenta
+                    ? "rgba(252, 3, 211, 0.75)"
+                    : "rgba(155, 81, 224, 0.65)";
+                ctx.fill();
+            });
+
+            requestAnimationFrame(drawSimulationFrame);
+        }
+
+        /**
+         * RENDER TIMELINE NODES & EVENT DETAILS
+         */
+        function buildTimelineNodes() {
+            timelineNodesContainer.innerHTML = "";
+            timelineEvents.forEach((ev, index) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "group relative flex flex-col items-center focus:outline-none cursor-pointer p-2";
+                btn.setAttribute("aria-label", `Select year ${ev.year}: ${ev.title}`);
+
+                const isActive = index === currentEventIndex;
+                const isPast = index < currentEventIndex;
+
+                btn.innerHTML = `
+                    <span class="text-xs font-mono mb-2 transition-colors ${isActive ? 'text-electricMagenta font-bold scale-110' : 'text-gray-400 group-hover:text-white'}">
+                        ${ev.year}
+                    </span>
+                    <span class="w-4 h-4 rounded-full border-2 transition-all duration-300 ${
+                        isActive
+                            ? 'bg-electricMagenta border-white scale-125 magenta-glow'
+                            : isPast
+                                ? 'bg-royalPlum border-electricMagenta/70'
+                                : 'bg-obsidian border-royalPlum group-hover:border-electricMagenta'
+                    }"></span>
+                    <span class="mt-2 text-[11px] max-w-[85px] text-center leading-tight line-clamp-1 transition-colors ${
+                        isActive ? 'text-white font-medium' : 'text-gray-500 group-hover:text-gray-300'
+                    }">
+                        ${ev.category}
+                    </span>
+                `;
+
+                btn.addEventListener("click", () => {
+                    stopAutoPlay();
+                    selectEvent(index);
+                });
+
+                timelineNodesContainer.appendChild(btn);
+            });
+        }
+
+        function selectEvent(index) {
+            if (index < 0 || index >= timelineEvents.length) return;
+            currentEventIndex = index;
+            const ev = timelineEvents[index];
+
+            // Retrigger subtle fade animation
+            eventContentBox.classList.remove("fade-in");
+            void eventContentBox.offsetWidth;
+            eventContentBox.classList.add("fade-in");
+
+            // Update UI Texts
+            eraPhaseTag.textContent = ev.phase;
+            canvasLocationLabel.textContent = ev.location;
+            canvasYearDisplay.textContent = ev.year;
+            atmosphereLabel.textContent = ev.atmosphere;
+
+            eventDateBadge.textContent = ev.date;
+            eventCategoryBadge.textContent = ev.category;
+            eventTitle.textContent = ev.title;
+            eventDescription.textContent = ev.description;
+            eventImpact.textContent = ev.impact;
+
+            // Connected resident link
+            const linkedResident = residentsData.find(r => r.id === ev.residentId) || residentsData[0];
+            quickResidentName.textContent = linkedResident.name;
+            quickResidentBtn.onclick = () => openResidentProfile(linkedResident.id);
+
+            // Step Counter & Button States
+            stepCounter.textContent = `${index + 1} / ${timelineEvents.length}`;
+            prevEventBtn.disabled = index === 0;
+            nextEventBtn.textContent = index === timelineEvents.length - 1 ? "Restart 1917 ↻" : "Next Event →";
+
+            // Progress Bar Fill
+            const pct = (index / (timelineEvents.length - 1)) * 100;
+            timelineProgressFill.style.width = `${pct}%`;
+
+            buildTimelineNodes();
+        }
+
+        /**
+         * AUTO-PLAY SIMULATION MODE
+         */
+        function startAutoPlay() {
+            isAutoPlaying = true;
+            playText.textContent = "Pause Era";
+            playIcon.classList.add("animate-ping");
+            toggleAutoPlayBtn.classList.add("border-electricMagenta");
+
+            autoPlayInterval = setInterval(() => {
+                const nextIdx = (currentEventIndex + 1) % timelineEvents.length;
+                selectEvent(nextIdx);
+            }, 4800);
+        }
+
+        function stopAutoPlay() {
+            isAutoPlaying = false;
+            playText.textContent = "Auto-Play Era";
+            playIcon.classList.remove("animate-ping");
+            toggleAutoPlayBtn.classList.remove("border-electricMagenta");
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+            }
+        }
+
+        toggleAutoPlayBtn.addEventListener("click", () => {
+            if (isAutoPlaying) {
+                stopAutoPlay();
+            } else {
+                startAutoPlay();
+            }
+        });
+
+        prevEventBtn.addEventListener("click", () => {
+            stopAutoPlay();
+            if (currentEventIndex > 0) selectEvent(currentEventIndex - 1);
+        });
+
+        nextEventBtn.addEventListener("click", () => {
+            stopAutoPlay();
+            if (currentEventIndex < timelineEvents.length - 1) {
+                selectEvent(currentEventIndex + 1);
+            } else {
+                selectEvent(0);
+            }
+        });
+
+        /**
+         * FAMOUS RESIDENTS DIRECTORY & LIFE STORIES MODAL
+         */
+        function renderResidentsModal(activeId) {
+            selectedResidentId = activeId;
+
+            // Render Left List
+            residentListContainer.innerHTML = "";
+            residentsData.forEach((res) => {
+                const isSelected = res.id === activeId;
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = `text-left px-4 py-3 rounded-xl border transition-all shrink-0 md:shrink cursor-pointer ${
+                    isSelected
+                        ? "bg-royalPlum border-electricMagenta text-white magenta-glow"
+                        : "bg-charcoalSurface border-royalPlum/40 text-gray-300 hover:border-electricMagenta/60 hover:text-white"
+                }`;
+                btn.innerHTML = `
+                    <div class="font-serif text-base sm:text-lg font-bold leading-snug">${res.name}</div>
+                    <div class="text-[11px] ${isSelected ? 'text-electricMagenta' : 'text-gray-400'}">${res.role}</div>
+                `;
+                btn.addEventListener("click", () => renderResidentsModal(res.id));
+                residentListContainer.appendChild(btn);
+            });
+
+            // Render Right Bio & Survival Details
+            const person = residentsData.find(r => r.id === activeId) || residentsData[0];
+            residentDetailContainer.innerHTML = `
+                <div class="fade-in">
+                    <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-royalPlum/50 mb-5">
+                        <div>
+                            <h3 class="font-serif text-3xl sm:text-4xl font-bold text-white">${person.name}</h3>
+                            <p class="text-xs sm:text-sm text-electricMagenta font-medium mt-0.5">${person.role} • ${person.years}</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full bg-obsidian border border-royalPlum text-xs text-gray-300">
+                            📍 ${person.address}
+                        </span>
+                    </div>
+
+                    <blockquote class="p-4 rounded-xl bg-obsidian/90 border-l-2 border-electricMagenta font-serif italic text-lg sm:text-xl text-gray-200 mb-6">
+                        “${person.quote}”
+                    </blockquote>
+
+                    <div class="space-y-5">
+                        <div>
+                            <h4 class="text-xs uppercase tracking-widest text-electricMagenta font-semibold mb-2">
+                                General Life & Artistic Contribution
+                            </h4>
+                            <p class="text-sm sm:text-base text-gray-300 leading-relaxed">
+                                ${person.generalLife}
+                            </p>
+                        </div>
+
+                        <div class="p-5 rounded-2xl bg-obsidian/70 border border-royalPlum/70">
+                            <h4 class="text-xs uppercase tracking-widest text-electricMagenta font-semibold mb-2 flex items-center gap-2">
+                                <span>✦</span> How They Managed to Live & Thrive in Harlem
+                            </h4>
+                            <p class="text-sm sm:text-base text-gray-200 leading-relaxed">
+                                ${person.howTheyLived}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openResidentProfile(residentId = "hughes") {
+            stopAutoPlay();
+            renderResidentsModal(residentId);
+            residentsModal.classList.remove("hidden");
+            residentsModal.classList.add("flex");
+        }
+
+        function closeResidentModal() {
+            residentsModal.classList.add("hidden");
+            residentsModal.classList.remove("flex");
+        }
+
+        openResidentsModalBtn.addEventListener("click", () => openResidentProfile(selectedResidentId));
+        closeResidentsModalBtn.addEventListener("click", closeResidentModal);
+        residentsModal.addEventListener("click", (e) => {
+            if (e.target === residentsModal) closeResidentModal();
+        });
+
+        // Keyboard Navigation Support
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && !residentsModal.classList.contains("hidden")) {
+                closeResidentModal();
+            } else if (residentsModal.classList.contains("hidden")) {
+                if (e.key === "ArrowRight") {
+                    stopAutoPlay();
+                    if (currentEventIndex < timelineEvents.length - 1) selectEvent(currentEventIndex + 1);
+                } else if (e.key === "ArrowLeft") {
+                    stopAutoPlay();
+                    if (currentEventIndex > 0) selectEvent(currentEventIndex - 1);
+                }
+            }
+        });
+
+        // Pointer & Touch Events for Interactive Canvas Glow
+        canvasContainer.addEventListener("mousemove", (e) => {
+            const rect = canvasContainer.getBoundingClientRect();
+            pointer.x = e.clientX - rect.left;
+            pointer.y = e.clientY - rect.top;
+            pointer.active = true;
+        });
+
+        canvasContainer.addEventListener("mouseleave", () => {
+            pointer.active = false;
+        });
+
+        canvasContainer.addEventListener("touchmove", (e) => {
+            if (e.touches.length > 0) {
+                const rect = canvasContainer.getBoundingClientRect();
+                pointer.x = e.touches[0].clientX - rect.left;
+                pointer.y = e.touches[0].clientY - rect.top;
+                pointer.active = true;
+            }
+        }, { passive: true });
+
+        window.addEventListener("resize", resizeCanvas);
+
+        // Initialize Simulation on Load
+        window.onload = function () {
+            resizeCanvas();
+            initParticles();
+            selectEvent(0);
+            drawSimulationFrame();
+        };
+    </script>
+</body>
+</html>
