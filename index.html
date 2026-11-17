@@ -1,164 +1,580 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Directory — Portal</title>
-    <!-- Tailwind CSS via CDN for zero-setup modern styling -->
+    <title>Yomar's CS Portfolio</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Inter Font for clean typography -->
+    <!-- Google Fonts: Inter & Space Mono for clean modern classic aesthetics -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
+                    colors: {
+                        bgMain: '#F8F7F4',      // 60% Background
+                        ink: '#1E2229',         // 30% Structure & Text
+                        accent: '#0057FF',      // 10% Accent
+                    },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        oled: '#000000',
-                        surface: '#0a0a0a',
-                        surfaceHover: '#121212',
-                        borderSubtle: '#1f1f1f',
-                        borderHover: '#383838',
+                        mono: ['Space Mono', 'monospace'],
                     }
                 }
             }
         }
     </script>
-    <style>
-        body {
-            background-color: #000000;
-            color: #ededed;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        /* Subtle radial glow at the top */
-        .top-glow {
-            background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.06) 0%, rgba(0, 0, 0, 0) 60%);
-        }
-    </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-white selection:text-black top-glow">
+<body class="bg-bgMain text-ink font-sans antialiased selection:bg-accent selection:text-white min-h-screen flex flex-col">
 
-    <!-- Main Container -->
-    <main class="w-full max-w-5xl mx-auto px-6 py-20 md:py-28">
-        
-        <!-- Header Section -->
-        <header class="mb-16">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface border border-borderSubtle text-xs text-neutral-400 mb-6">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Index &amp; Directory</span>
+    <!-- =====================================================================
+         SAMPLE SWITCHER BAR (Allows Yomar to preview & pick the best design)
+         ===================================================================== -->
+    <div class="sticky top-0 z-50 bg-ink text-bgMain border-b border-ink/20 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-accent animate-pulse"></span>
+                <span class="text-xs font-mono uppercase tracking-wider text-bgMain/80">Portfolio Layout Previewer:</span>
             </div>
-            <h1 class="text-4xl md:text-5xl font-semibold tracking-tight text-white mb-4">
-                Workspace Portal.
-            </h1>
-            <p class="text-neutral-400 text-lg max-w-xl font-light leading-relaxed">
-                A curated collection of projects, web applications, and digital spaces. Select a destination below to launch.
-            </p>
-        </header>
-
-        <!-- Sites Grid (Populated automatically by the script below) -->
-        <div id="sites-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- Cards will be injected here -->
+            
+            <!-- Layout Selection Buttons -->
+            <div class="flex flex-wrap items-center justify-center gap-1.5" role="tablist" aria-label="Portfolio Style Samples">
+                <button onclick="switchTheme('gallery')" id="tab-gallery" class="layout-tab px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 bg-accent text-white shadow-sm">
+                    1. Classic Gallery
+                </button>
+                <button onclick="switchTheme('editorial')" id="tab-editorial" class="layout-tab px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 bg-white/10 text-bgMain/80 hover:bg-white/20">
+                    2. Minimal Index
+                </button>
+                <button onclick="switchTheme('bento')" id="tab-bento" class="layout-tab px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 bg-white/10 text-bgMain/80 hover:bg-white/20">
+                    3. Architectural Bento
+                </button>
+                <button onclick="switchTheme('split')" id="tab-split" class="layout-tab px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 bg-white/10 text-bgMain/80 hover:bg-white/20">
+                    4. Studio Sidebar
+                </button>
+            </div>
         </div>
+    </div>
 
+    <!-- =====================================================================
+         MAIN PORTFOLIO CONTAINER (Dynamically rendered based on selected sample)
+         ===================================================================== -->
+    <main id="app-root" class="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 transition-opacity duration-200">
+        <!-- Content injected via JavaScript -->
     </main>
 
-    <!-- Minimal Footer -->
-    <footer class="w-full max-w-5xl mx-auto px-6 py-8 border-t border-borderSubtle flex flex-col sm:flex-row justify-between items-center text-xs text-neutral-500 gap-4">
-        <p>&copy; <span id="year"></span> All rights reserved.</p>
-        <p class="font-mono text-neutral-600">STATUS: ONLINE</p>
+    <!-- =====================================================================
+         SIMPLE FOOTER
+         ===================================================================== -->
+    <footer class="border-t border-ink/10 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-ink/60">
+            <p>&copy; <span id="year"></span> Yomar's CS Portfolio. Built for speed &amp; clarity.</p>
+            <p class="font-mono">60% #F8F7F4 &bull; 30% #1E2229 &bull; 10% #0057FF</p>
+        </div>
     </footer>
 
-    <!-- =================================================================== -->
-    <!-- CONFIGURATION: ADD OR EDIT YOUR SITES IN THE LIST BELOW             -->
-    <!-- =================================================================== -->
+    <!-- =====================================================================
+         JAVASCRIPT LOGIC & PROJECT DATA
+         ===================================================================== -->
     <script>
-        const sites = [
+        // Set current year in footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        /**
+         * PORTFOLIO PROJECTS DATA
+         * Add future projects here! 
+         * Categories must match: 'Sims', 'Sites', 'Games', or 'Other'
+         */
+        const projects = [
             {
-                title: "Main Portfolio",
-                description: "Personal showcase, case studies, and design work.",
-                url: "https://example.com",
-                tag: "Live"
+                id: 'sim-1',
+                title: 'Simulation 01',
+                category: 'Sims',
+                description: 'My first interactive computer science simulation exploring physics, motion, and algorithmic rules.',
+                url: 'sim1.html',
+                year: '2026',
+                featured: true,
+                tags: ['HTML5', 'JavaScript', 'Physics']
+            },
+            // --- Placeholder templates below so you can see how filtering looks across categories ---
+            {
+                id: 'site-placeholder',
+                title: 'Future Web Project',
+                category: 'Sites',
+                description: 'Upcoming responsive web application built with clean architecture and modern UI patterns.',
+                url: 'sim1.html',
+                year: 'Soon',
+                featured: false,
+                isPlaceholder: true,
+                tags: ['Web', 'UI/UX']
             },
             {
-                title: "Web App Dashboard",
-                description: "Analytics and internal management tools.",
-                url: "https://example.com",
-                tag: "App"
+                id: 'game-placeholder',
+                title: 'Future Arcade Game',
+                category: 'Games',
+                description: 'Upcoming browser-based interactive game featuring custom canvas mechanics and collision logic.',
+                url: 'sim1.html',
+                year: 'Soon',
+                featured: false,
+                isPlaceholder: true,
+                tags: ['Canvas', 'Game Loop']
             },
             {
-                title: "Documentation",
-                description: "Guides, API references, and system architecture.",
-                url: "https://example.com",
-                tag: "Docs"
-            },
-            // To add a new site later, copy from '{' to '},' and paste it below:
-            {
-                title: "Future Slot 01",
-                description: "Reserved space for an upcoming project or link.",
-                url: "#",
-                tag: "Soon",
-                placeholder: true // Set to false when you add a real link
-            },
-            {
-                title: "Future Slot 02",
-                description: "Reserved space for an upcoming project or link.",
-                url: "#",
-                tag: "Soon",
-                placeholder: true
+                id: 'other-placeholder',
+                title: 'Algorithm Sandbox',
+                category: 'Other',
+                description: 'Experimental data structures, visualizers, and creative coding utilities.',
+                url: 'sim1.html',
+                year: 'Soon',
+                featured: false,
+                isPlaceholder: true,
+                tags: ['Algorithms', 'Experiments']
             }
         ];
 
-        // ===================================================================
-        // RENDER LOGIC (No need to edit below this line)
-        // ===================================================================
-        const grid = document.getElementById('sites-grid');
-        document.getElementById('year').textContent = new Date().getFullYear();
+        // Available filter categories in exact order requested
+        const categories = ['All', 'Sims', 'Sites', 'Games', 'Other'];
 
-        sites.forEach(site => {
-            const isPlaceholder = site.placeholder;
-            const card = document.createElement(isPlaceholder ? 'div' : 'a');
+        // Application State
+        let state = {
+            currentLayout: 'gallery', // 'gallery' | 'editorial' | 'bento' | 'split'
+            activeCategory: 'All'
+        };
+
+        /**
+         * Switches between the 4 portfolio sample designs
+         */
+        function switchTheme(layoutName) {
+            state.currentLayout = layoutName;
             
-            if (!isPlaceholder) {
-                card.href = site.url;
-                card.target = "_blank";
-                card.rel = "noopener noreferrer";
+            // Update switcher tab styling
+            document.querySelectorAll('.layout-tab').forEach(btn => {
+                btn.classList.remove('bg-accent', 'text-white', 'shadow-sm');
+                btn.classList.add('bg-white/10', 'text-bgMain/80', 'hover:bg-white/20');
+            });
+            const activeBtn = document.getElementById(`tab-${layoutName}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white/10', 'text-bgMain/80', 'hover:bg-white/20');
+                activeBtn.classList.add('bg-accent', 'text-white', 'shadow-sm');
             }
 
-            // Styling for active cards vs placeholder slots
-            card.className = isPlaceholder
-                ? "group relative flex flex-col justify-between p-6 rounded-2xl bg-black border border-dashed border-borderSubtle opacity-50 select-none"
-                : "group relative flex flex-col justify-between p-6 rounded-2xl bg-surface border border-borderSubtle hover:bg-surfaceHover hover:border-borderHover transition-all duration-300 ease-out hover:-translate-y-0.5";
+            renderApp();
+        }
 
-            card.innerHTML = `
-                <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-[11px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-md ${isPlaceholder ? 'bg-neutral-900 text-neutral-600' : 'bg-neutral-900 text-neutral-300 border border-neutral-800'}">
-                            ${site.tag}
-                        </span>
-                        ${!isPlaceholder ? `
-                        <svg class="w-4 h-4 text-neutral-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M7 17L17 7M17 7H8M17 7V16" />
-                        </svg>
-                        ` : ''}
-                    </div>
-                    <h2 class="text-lg font-medium text-white mb-2 group-hover:text-white">
-                        ${site.title}
-                    </h2>
-                    <p class="text-sm text-neutral-400 font-light leading-relaxed">
-                        ${site.description}
-                    </p>
+        /**
+         * Filters displayed projects by category
+         */
+        function setCategory(category) {
+            state.activeCategory = category;
+            renderApp();
+        }
+
+        /**
+         * Returns filtered list of projects
+         */
+        function getFilteredProjects() {
+            if (state.activeCategory === 'All') {
+                return projects;
+            }
+            return projects.filter(p => p.category === state.activeCategory);
+        }
+
+        /**
+         * Generates Filter Buttons HTML
+         */
+        function renderFilterButtons(variant = 'pill') {
+            return categories.map(cat => {
+                const isActive = state.activeCategory === cat;
+                const count = cat === 'All' 
+                    ? projects.length 
+                    : projects.filter(p => p.category === cat).length;
+
+                if (variant === 'underline') {
+                    return `
+                        <button 
+                            onclick="setCategory('${cat}')" 
+                            class="pb-2 text-sm font-medium transition-all border-b-2 flex items-center gap-1.5 ${
+                                isActive 
+                                ? 'border-accent text-accent font-semibold' 
+                                : 'border-transparent text-ink/60 hover:text-ink'
+                            }">
+                            <span>${cat}</span>
+                            <span class="text-xs font-mono opacity-70">(${count})</span>
+                        </button>
+                    `;
+                }
+
+                if (variant === 'sidebar') {
+                    return `
+                        <button 
+                            onclick="setCategory('${cat}')" 
+                            class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-between ${
+                                isActive 
+                                ? 'bg-ink text-bgMain shadow-sm' 
+                                : 'text-ink/70 hover:bg-ink/5 hover:text-ink'
+                            }">
+                            <span>${cat}</span>
+                            <span class="text-xs font-mono px-2 py-0.5 rounded-md ${isActive ? 'bg-accent text-white' : 'bg-ink/10 text-ink/70'}">${count}</span>
+                        </button>
+                    `;
+                }
+
+                // Default 'pill' style
+                return `
+                    <button 
+                        onclick="setCategory('${cat}')" 
+                        class="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                            isActive 
+                            ? 'bg-ink text-bgMain shadow-sm ring-2 ring-ink ring-offset-2 ring-offset-bgMain' 
+                            : 'bg-white text-ink/80 border border-ink/15 hover:border-accent hover:text-accent'
+                        }">
+                        <span>${cat}</span>
+                        <span class="text-xs font-mono ${isActive ? 'text-accent bg-bgMain px-1.5 py-0.2 rounded-full font-bold' : 'text-ink/40'}">${count}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        /**
+         * Generates minimal geometric SVG preview graphic for project cards
+         */
+        function getCategoryGraphic(category) {
+            switch(category) {
+                case 'Sims':
+                    return `<svg class="w-8 h-8 text-accent" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="16" cy="16" r="10" stroke-dasharray="3 3"/>
+                        <circle cx="16" cy="16" r="4" fill="currentColor"/>
+                        <path d="M16 2v4M16 26v4M2 16h4M26 16h4"/>
+                    </svg>`;
+                case 'Sites':
+                    return `<svg class="w-8 h-8 text-ink" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="4" y="6" width="24" height="20" rx="3"/>
+                        <path d="M4 12h24M9 9h.01M13 9h.01"/>
+                    </svg>`;
+                case 'Games':
+                    return `<svg class="w-8 h-8 text-ink" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="4" y="9" width="24" height="14" rx="7"/>
+                        <path d="M10 16h4M12 14v4M20 15h.01M23 17h.01"/>
+                    </svg>`;
+                default:
+                    return `<svg class="w-8 h-8 text-ink" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="16 4 28 11 28 21 16 28 4 21 4 11 16 4"/>
+                        <circle cx="16" cy="16" r="3"/>
+                    </svg>`;
+            }
+        }
+
+        /* =====================================================================
+           SAMPLE 1: CLASSIC GALLERY (Clean Cards, Generous Whitespace)
+           ===================================================================== */
+        function renderGalleryLayout(filtered) {
+            return `
+                <div class="space-y-12">
+                    <!-- Header -->
+                    <header class="text-center max-w-2xl mx-auto space-y-4">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ink/5 border border-ink/10 text-xs font-mono uppercase tracking-widest text-ink/70">
+                            Computer Science &amp; Creative Code
+                        </div>
+                        <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-ink">
+                            Yomar's CS Portfolio
+                        </h1>
+                        <p class="text-base sm:text-lg text-ink/70 leading-relaxed">
+                            A curated archive of interactive simulations, web applications, and games built from scratch.
+                        </p>
+                    </header>
+
+                    <!-- Filter Bar -->
+                    <nav aria-label="Project Categories" class="flex flex-wrap items-center justify-center gap-2.5">
+                        ${renderFilterButtons('pill')}
+                    </nav>
+
+                    <!-- Project Grid -->
+                    <section class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+                        ${filtered.map(project => `
+                            <a href="${project.url}" target="_blank" rel="noopener noreferrer" 
+                               class="group relative flex flex-col justify-between bg-white rounded-2xl p-6 sm:p-8 border border-ink/10 hover:border-accent transition-all duration-300 shadow-sm hover:shadow-md ${project.isPlaceholder ? 'opacity-75 hover:opacity-100' : ''}">
+                                
+                                <div>
+                                    <!-- Top Row: Icon & Category Badge -->
+                                    <div class="flex items-start justify-between gap-4 mb-6">
+                                        <div class="w-12 h-12 rounded-xl bg-bgMain border border-ink/10 flex items-center justify-center group-hover:scale-105 transition-transform">
+                                            ${getCategoryGraphic(project.category)}
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            ${project.isPlaceholder ? `<span class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-ink/5 text-ink/60">Slot Ready</span>` : ''}
+                                            <span class="text-xs font-mono font-semibold px-3 py-1 rounded-full ${project.category === 'Sims' ? 'bg-accent/10 text-accent' : 'bg-ink/5 text-ink'}">
+                                                ${project.category}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Title & Description -->
+                                    <h2 class="text-xl sm:text-2xl font-bold text-ink group-hover:text-accent transition-colors mb-2 flex items-center gap-2">
+                                        ${project.title}
+                                        <svg class="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-accent" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7V17"/>
+                                        </svg>
+                                    </h2>
+                                    <p class="text-sm sm:text-base text-ink/70 leading-relaxed mb-6">
+                                        ${project.description}
+                                    </p>
+                                </div>
+
+                                <!-- Card Footer -->
+                                <div class="pt-4 border-t border-ink/10 flex items-center justify-between text-xs font-mono text-ink/60">
+                                    <span>${project.url}</span>
+                                    <span class="text-accent font-semibold group-hover:underline">Launch &rarr;</span>
+                                </div>
+                            </a>
+                        `).join('')}
+                    </section>
                 </div>
             `;
+        }
 
-            grid.appendChild(card);
-        });
+        /* =====================================================================
+           SAMPLE 2: MINIMAL INDEX (Swiss Editorial Typography & Clean Rows)
+           ===================================================================== */
+        function renderEditorialLayout(filtered) {
+            return `
+                <div class="max-w-4xl mx-auto space-y-12">
+                    <!-- Editorial Header -->
+                    <header class="border-b-2 border-ink pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                        <div>
+                            <p class="font-mono text-xs uppercase tracking-widest text-accent mb-2">Index / 2026</p>
+                            <h1 class="text-4xl sm:text-6xl font-bold tracking-tight text-ink">
+                                Yomar's CS Portfolio
+                            </h1>
+                        </div>
+                        <p class="text-sm text-ink/70 max-w-xs">
+                            Selected works in simulation, web engineering, and interactive software.
+                        </p>
+                    </header>
+
+                    <!-- Underline Filter Tabs -->
+                    <nav aria-label="Project Categories" class="flex flex-wrap items-center gap-6 border-b border-ink/15">
+                        ${renderFilterButtons('underline')}
+                    </nav>
+
+                    <!-- Clean Directory List -->
+                    <section class="divide-y divide-ink/15">
+                        ${filtered.map((project, index) => `
+                            <a href="${project.url}" target="_blank" rel="noopener noreferrer" 
+                               class="group py-6 sm:py-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/60 px-4 -mx-4 rounded-xl transition-colors">
+                                
+                                <div class="flex items-start sm:items-center gap-4 sm:gap-6">
+                                    <span class="font-mono text-sm text-ink/40 pt-1 sm:pt-0">0${index + 1}</span>
+                                    <div>
+                                        <div class="flex items-center gap-3">
+                                            <h2 class="text-xl sm:text-2xl font-semibold text-ink group-hover:text-accent transition-colors">
+                                                ${project.title}
+                                            </h2>
+                                            ${project.isPlaceholder ? `<span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded border border-ink/20 text-ink/50">Template</span>` : ''}
+                                        </div>
+                                        <p class="text-sm text-ink/65 mt-1 max-w-xl">${project.description}</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between sm:justify-end gap-4 pl-8 sm:pl-0">
+                                    <span class="font-mono text-xs px-3 py-1 rounded-md bg-ink/5 text-ink font-medium">
+                                        ${project.category}
+                                    </span>
+                                    <span class="w-9 h-9 rounded-full border border-ink/20 flex items-center justify-center group-hover:bg-accent group-hover:border-accent group-hover:text-white transition-all">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7V17"/>
+                                        </svg>
+                                    </span>
+                                </div>
+                            </a>
+                        `).join('')}
+                    </section>
+                </div>
+            `;
+        }
+
+        /* =====================================================================
+           SAMPLE 3: ARCHITECTURAL BENTO (Structured Grid & Featured Hero Card)
+           ===================================================================== */
+        function renderBentoLayout(filtered) {
+            return `
+                <div class="space-y-8">
+                    <!-- Top Bento Hero Banner -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 bg-ink text-bgMain rounded-3xl p-8 sm:p-10 flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="font-mono text-xs uppercase tracking-widest text-bgMain/60">Portfolio Directory</span>
+                                <span class="w-3 h-3 rounded-full bg-accent"></span>
+                            </div>
+                            <div class="mt-8">
+                                <h1 class="text-3xl sm:text-5xl font-bold tracking-tight mb-3">
+                                    Yomar's CS Portfolio
+                                </h1>
+                                <p class="text-bgMain/75 text-sm sm:text-base max-w-xl">
+                                    Explore simulations, websites, games, and experimental code. Every project opens cleanly in a new tab.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Filter Control Box -->
+                        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-ink/10 flex flex-col justify-between">
+                            <div>
+                                <h2 class="font-mono text-xs uppercase tracking-wider text-ink/50 mb-4">Filter by Category</h2>
+                                <div class="flex flex-wrap gap-2">
+                                    ${renderFilterButtons('pill')}
+                                </div>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-ink/10 flex items-center justify-between text-xs text-ink/60 font-mono">
+                                <span>Showing: ${state.activeCategory}</span>
+                                <span>${filtered.length} Item(s)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bento Project Tiles -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${filtered.map((project, idx) => `
+                            <a href="${project.url}" target="_blank" rel="noopener noreferrer" 
+                               class="${idx === 0 && state.activeCategory === 'All' ? 'sm:col-span-2' : ''} group bg-white rounded-3xl p-7 border border-ink/10 hover:border-accent transition-all flex flex-col justify-between min-h-[230px]">
+                                
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="px-3 py-1 rounded-lg text-xs font-mono font-semibold ${project.category === 'Sims' ? 'bg-accent text-white' : 'bg-bgMain text-ink border border-ink/10'}">
+                                        ${project.category}
+                                    </span>
+                                    <span class="text-xs font-mono text-ink/50">${project.year}</span>
+                                </div>
+
+                                <div class="my-6">
+                                    <h3 class="text-2xl font-bold text-ink group-hover:text-accent transition-colors mb-2">
+                                        ${project.title}
+                                    </h3>
+                                    <p class="text-sm text-ink/70 leading-relaxed">
+                                        ${project.description}
+                                    </p>
+                                </div>
+
+                                <div class="flex items-center justify-between pt-4 border-t border-ink/10">
+                                    <div class="flex gap-1.5">
+                                        ${project.tags.map(t => `<span class="text-[11px] font-mono text-ink/60 bg-bgMain px-2 py-0.5 rounded">${t}</span>`).join('')}
+                                    </div>
+                                    <span class="text-xs font-semibold text-accent flex items-center gap-1">
+                                        Open Tab
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7V17"/>
+                                        </svg>
+                                    </span>
+                                </div>
+                            </a>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        /* =====================================================================
+           SAMPLE 4: STUDIO SIDEBAR (Persistent Left Nav + Clean Right Feed)
+           ===================================================================== */
+        function renderSplitLayout(filtered) {
+            return `
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+                    <!-- Left Sticky Sidebar -->
+                    <aside class="lg:col-span-4 lg:sticky lg:top-20 bg-white rounded-2xl p-6 sm:p-8 border border-ink/10 space-y-8">
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-accent text-white font-mono font-bold flex items-center justify-center text-lg mb-4">
+                                Y
+                            </div>
+                            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+                                Yomar's CS Portfolio
+                            </h1>
+                            <p class="text-sm text-ink/70 mt-2 leading-relaxed">
+                                A clean index of my computer science builds, simulations, websites, and games.
+                            </p>
+                        </div>
+
+                        <div class="space-y-2">
+                            <p class="text-xs font-mono uppercase tracking-wider text-ink/50 px-1">Categories</p>
+                            <nav aria-label="Project Categories" class="space-y-1.5">
+                                ${renderFilterButtons('sidebar')}
+                            </nav>
+                        </div>
+                    </aside>
+
+                    <!-- Right Content Feed -->
+                    <section class="lg:col-span-8 space-y-5">
+                        <div class="flex items-center justify-between pb-2 border-b border-ink/10">
+                            <h2 class="font-mono text-xs uppercase tracking-wider text-ink/60">
+                                Category: <strong class="text-ink">${state.activeCategory}</strong>
+                            </h2>
+                            <span class="font-mono text-xs text-ink/50">${filtered.length} Project(s)</span>
+                        </div>
+
+                        ${filtered.map(project => `
+                            <a href="${project.url}" target="_blank" rel="noopener noreferrer" 
+                               class="group block bg-white rounded-2xl p-6 sm:p-7 border border-ink/10 hover:border-accent transition-all shadow-sm">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div class="space-y-2">
+                                        <div class="flex items-center gap-2.5">
+                                            <span class="text-xs font-mono font-semibold text-accent uppercase tracking-wider">
+                                                ${project.category}
+                                            </span>
+                                            <span class="text-ink/30">&bull;</span>
+                                            <span class="text-xs font-mono text-ink/50">${project.url}</span>
+                                        </div>
+                                        <h3 class="text-xl sm:text-2xl font-bold text-ink group-hover:text-accent transition-colors">
+                                            ${project.title}
+                                        </h3>
+                                        <p class="text-sm text-ink/70 max-w-xl">
+                                            ${project.description}
+                                        </p>
+                                    </div>
+
+                                    <div class="shrink-0">
+                                        <span class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-bgMain group-hover:bg-accent text-ink group-hover:text-white text-xs font-semibold transition-colors">
+                                            Open Project
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7V17"/>
+                                            </svg>
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        `).join('')}
+                    </section>
+                </div>
+            `;
+        }
+
+        /**
+         * Main Render Function
+         */
+        function renderApp() {
+            const root = document.getElementById('app-root');
+            const filtered = getFilteredProjects();
+
+            let html = '';
+            switch (state.currentLayout) {
+                case 'editorial':
+                    html = renderEditorialLayout(filtered);
+                    break;
+                case 'bento':
+                    html = renderBentoLayout(filtered);
+                    break;
+                case 'split':
+                    html = renderSplitLayout(filtered);
+                    break;
+                case 'gallery':
+                default:
+                    html = renderGalleryLayout(filtered);
+                    break;
+            }
+
+            root.innerHTML = html;
+        }
+
+        // Initial render on load
+        window.addEventListener('DOMContentLoaded', renderApp);
     </script>
 </body>
 </html>
